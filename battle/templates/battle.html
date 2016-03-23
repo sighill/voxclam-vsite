@@ -1,0 +1,64 @@
+{% block header %}
+    <head>
+        <title>Page de bataille</title>
+        <style>
+            *{margin:6;padding:6;color:white;font-family: Helvetica, Arial, sans-serif;}
+            table , th , td {border-width: 1px;border-style:solid; border-color:black;border-collapse:collapse;width:860px;text-align: center;}
+            body{text-align:center;background-color: #1A2530}
+            h1{padding-bottom: 20px;padding-top: 5px;}
+            p{padding-bottom: 10px;}
+            #wrapper{width:880px;margin:0 auto;text-align:center;background-color:#34495E;}
+            #wip{color: yellow}
+            #logTitle{margin: 1;padding: 1;border-style:solid; border-color:black;border-collapse:collapse;width:860px;text-align: center;}
+            #logSubtitle{font-weight: bold;}
+
+        </style>
+        <meta name="robots" content="NONE,NOARCHIVE" />
+    </head>
+{% endblock %}
+
+{% block body %}
+        <div id="wrapper">
+            <h1>Groupes prêts à combattre</h1>
+
+            <p>Ce tableau montre les groupes enregistrés dans la db actuellement</p>
+
+            <table>
+                <th>Groupe</th><th>Propriétaire</th><th>Main droite</th><th>Main gauche</th><th>Armure</th>
+                {% for groupObject in groupList %}
+                    <tr>
+                        <td>{{groupObject.groupName}}</td>
+                        <td>{{groupObject.groupOwner}}</td>
+                        <td>{{groupObject.equiRH}}</td>
+                        <td>{{groupObject.equiLH}}</td>
+                        <td>{{groupObject.equiArmor}}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+
+            <h1>Tableau des stats d'équipement</h1>  
+
+            <table>
+                <th>Equipement</th><th>PAC</th><th>INI</th><th>MOV</th><th>STR</th><th>EVA</th><th>DEF</th><th>FAV</th><th>MOR</th>
+            {% for equipmentObject in equipmentList %}
+                <tr>
+                    <td>{{equipmentObject.equipmentName}}</td>
+                    <td>{{equipmentObject.modPAC}}</td>
+                    <td>{{equipmentObject.modINI}}</td>
+                    <td>{{equipmentObject.modMOV}}</td>
+                    <td>{{equipmentObject.modSTR}}</td>
+                    <td>{{equipmentObject.modEVA}}</td>
+                    <td>{{equipmentObject.modDEF}}</td>
+                    <td>{{equipmentObject.modFAV}}</td>
+                    <td>{{equipmentObject.modMOR}}</td>
+            {% endfor %}        
+                </tr>
+            </table>
+
+            <h1>Exemple de compte rendu de bataille</h1>
+            
+            <p id="wip">Work in progress : afficher ce compte rendu après que l'utilisateur ait choisi les groupes à faire combattre ! :)</p>
+            
+            {{battleLogFinal|safe}}
+        </div>
+{% endblock %}

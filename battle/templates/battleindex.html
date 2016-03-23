@@ -1,0 +1,50 @@
+{# Template de génération de la page test permettant de passer des paramètres à battleEngineCore #}
+
+{# Header : css style is still in there, that's something to change already #}
+{% block header %}
+    <head>
+        <title>Index des groupes</title>
+        <style>
+            *{margin:6;padding:6;color:white;font-family: Helvetica, Arial, sans-serif;}
+            table , th , td {border-width: 1px;border-style:solid; border-color:black;border-collapse:collapse;width:860px;text-align: center;}
+            body{text-align:center;background-color: #1A2530}
+            h1{padding-bottom: 20px;padding-top: 5px;}
+            p{padding-bottom: 10px;}
+            #wrapper{width:880px;margin:0 auto;text-align:center;background-color:#34495E;}
+            #wip{color: yellow}
+            #blackTExt{color:black;}
+        </style>
+        <meta name="robots" content="NONE,NOARCHIVE" />
+    </head>
+{% endblock %}
+
+{# Body of the page #}
+{% block body %}
+    {# To render a centered column I use a wrapper with the right css in the header #}
+    <div id="wrapper">
+        <h1>Choisissez deux groupes parmi la liste pour obtenir leur log de bataille</h1>
+        
+        <p id="wip">Formulaire permettant de choisir le 1e groupe</p>
+        
+        {# The form is intended to capture the choice of the user for groups to lead to battle #}
+        <form method="post">
+        {# Token is here for protection againt code injection #}
+        {%  csrf_token %}
+
+        {# First part of the form : choosing the first group, which GID will be set in GIDA variable to pass forward to the next view /battle #}
+        <p>Premier groupe en combat :</p>
+        {% for group in groupList %}
+            <p><input type="radio" name="GIDA" id="GIDA{{ forloop.counter }}" value="{{ group.groupGid }}" /> {{group.groupName}}</p>
+            <label for="GIDA{{ forloop.counter }}">{{ choice.choice_text }}</label>
+        {% endfor %}
+
+        {# Second part of the form for GIDB #}
+        <p>Deuxième groupe en combat :</p>
+        {% for group in groupList %}
+            <p><input type="radio" name="GIDB" id="GIDB{{ forloop.counter }}" value="{{ group.groupGid }}" />{{group.groupName}}</p>
+            <label for="GIDB{{ forloop.counter }}">{{ choice.choice_text }}</label>
+        {% endfor %}
+
+        {# WIP #}
+        <p><input id="blackText" type="submit" value="Lancer la bataille"></p>
+{% endblock %}
