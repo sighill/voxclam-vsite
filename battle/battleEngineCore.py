@@ -33,6 +33,48 @@ class GroupBattle:
         self.caracFAV = group.groupFAV + group.equiRH.modFAV + group.equiLH.modFAV + group.equiArmor.modFAV
         self.caracMOR = group.groupMOR + group.equiRH.modMOR + group.equiLH.modMOR + group.equiArmor.modMOR
 
+        # Check des min / max
+        # TODO: définir les min / max. Pour le moment je les met toutes entre 1 et 99
+        if( self.caracPAC < 1 ):
+            self.caracPAC = 1
+        elif( self.caracPAC > 99 ):
+            self.caracPAC = 99
+
+        if( self.caracMOV < 1 ):
+            self.caracMOV = 1
+        elif( self.caracMOV > 99 ):
+            self.caracMOV = 99
+
+        if( self.caracINI < 1 ):
+            self.caracINI = 1
+        elif( self.caracINI > 99 ):
+            self.caracINI = 99
+
+        if( self.caracSTR < 1 ):
+            self.caracSTR = 1
+        elif( self.caracSTR > 99 ):
+            self.caracSTR = 99
+
+        if( self.caracEVA < 1 ):
+            self.caracEVA = 1
+        elif( self.caracEVA > 99 ):
+            self.caracEVA = 99
+
+        if( self.caracDEF < 1 ):
+            self.caracDEF = 1
+        elif( self.caracDEF > 99 ):
+            self.caracDEF = 99
+
+        if( self.caracFAV < 1 ):
+            self.caracFAV = 1
+        elif( self.caracFAV > 99 ):
+            self.caracFAV = 99
+
+        if( self.caracMOR < 1 ):
+            self.caracMOR = 1
+        elif( self.caracMOR > 99 ):
+            self.caracMOR = 99
+
 ###############################################################################        
 # Liste des variables globales utilisées par le Battle Engine
 ###############################################################################
@@ -44,27 +86,40 @@ global battleLog
 global numberOfRounds
 global deathMatchMode
 
+# Constantes utilisées pour l'équilibrage de la bataille
+DEF_TO_PV_MULTIPLICATOR = 3
+
 ###############################################################################
 # Cette fonction permet d'apporter du hasard dans le combat. 
-# Elle renvoie un réel compris entre [-margin;margin] 
+# Elle renvoie un réel compris entre [number-margin %;number+margin %] 
 # avec margin noté comme un pourcentage
 ###############################################################################
-def delta(margin , number):
+def delta( number, margin ):
     # vérifier que la marge est bien entre -100 et 100.
-    if( margin < -100):
+    if( margin < -100 ):
         margin = -100
     elif( margin > 100 ):
         margin = 100
+
     # appliquer le random
     deltaRandom = randint(-margin,margin)/100
-    return ceil(number * deltaRandom)
+    modificator = ceil(number * deltaRandom)
+    randomizedValue = number + modificator
+
+    # vérification des bornes
+    if( randomizedValue < 0 ):
+        randomizedValue = 0
+    elif( randomizedValue > 100 ):
+        randomizedValue = 100
+
+    return randomizedValue
 
 ###############################################################################
 # Cette function est le coeur du battle engine
 # On lui fournit les deux groupes prêts à combattre
 # et elle retourne le compte rendu du combat à afficher
 ###############################################################################
-def performBattle( groupA, groupB ):
+def performBattle( groupA, groupB ):    
     # On récupère les variables globales nécessaires...
     global battleLog
     global numberOfRounds
@@ -131,42 +186,53 @@ def performBattle( groupA, groupB ):
         groupBattleA.membersStartRound = groupBattleA.group.groupMemberHealthy
         groupBattleB.membersStartRound = groupBattleB.group.groupMemberHealthy
         
-        # On lance la 1e phase du round: uniquement lors du 1er tound
-        if( currentRound == 1):
-            addLog( 'logSubTitle' , 'Phase d\'initiative' )
-            # Déterminer qui a le bonus d'initiative pour le 1er round
-            phaseInitiative( groupBattleA, groupBattleB )
-        elif( currentRound == 2):
-            # Sinon (à partir du round 2), plus de bonus d'initiative
-            groupBattleA.bonusINI = False
-            groupBattleB.bonusINI = False
-
-        # On lance la 2e phase du round
-        addLog( 'logSubTitle' , 'Phase de combat: "{}" attaque !'.format( groupBattleA.group.groupName ))
-        phaseCombat( groupBattleA, groupBattleB )
-        addLog( 'logSubTitle' , '"{}" riposte !'.format( groupBattleB.group.groupName ))
-        phaseCombat( groupBattleB, groupBattleA )
-
-        # TODO On lance la 3e phase du round
-        # phaseMorale(groupA , groupB) 
-
-        # On lance la 4e phase du round
-        addLog( 'logSubTitle' , 'Phase de maintenance :')
-        phaseMaintenance( groupBattleA, groupBattleB )
+        # On lance le round de combat au corps à corps
+        performBattleRoundH2H( groupBattleA, groupBattleB )
 
         # Fin du round, passage au round suivant
         currentRound += 1
 
     return battleLog
 
+###############################################################################
+# Cette exécute un round de combat entre deux groupes qui combattent au 
+# corps à corps (hand-to-hand = H2H)
+# C'est cette fonction qui sera appelé dans le cas d'une battaille entre
+# deux armées
+###############################################################################
+def performBattleRoundH2H( groupBattleA, groupBattleB ):
+    # On lance la 1e phase du round: uniquement lors du 1er round
+    # TODO: dans le cadre d'une bataille entre deux armées, il faudra revoir
+    # l'utilisation de l'initiative (puisque la notion de 1er round est différente)
+    #if( currentRound == 1):
+    #    addLog( 'logSubTitle' , 'Phase d\'initiative' )
+    #    # Déterminer qui a le bonus d'initiative pour le 1er round
+    #    phaseInitiative( groupBattleA, groupBattleB )
+    #elif( currentRound == 2):
+    #    # Sinon (à partir du round 2), plus de bonus d'initiative
+    #    groupBattleA.bonusINI = False
+    #    groupBattleB.bonusINI = False
+
+    # On lance la 2e phase du round
+    addLog( 'logSubTitle' , 'Phase de combat: "{}" attaque !'.format( groupBattleA.group.groupName ))
+    phaseCombat( groupBattleA, groupBattleB )
+    addLog( 'logSubTitle' , '"{}" riposte !'.format( groupBattleB.group.groupName ))
+    phaseCombat( groupBattleB, groupBattleA )
+
+    # TODO On lance la 3e phase du round
+    # phaseMorale(groupA , groupB) 
+
+    # On lance la 4e phase du round
+    addLog( 'logSubTitle' , 'Phase de maintenance :')
+    phaseMaintenance( groupBattleA, groupBattleB )
 
 ###############################################################################
-# Cette fonction réalise un round de la bataille
+# Phase d'initiative
 ###############################################################################
 def phaseInitiative( groupBattleA, groupBattleB ):
     # On détermine qui a l'initiative, et donc le bonus de STR
-    groupAINI = groupBattleA.caracINI + delta(50,groupBattleA.caracINI)
-    groupBINI = groupBattleB.caracINI + delta(50,groupBattleB.caracINI)
+    groupAINI = delta( groupBattleA.caracINI, 50 )
+    groupBINI = delta( groupBattleB.caracINI, 50 )
     if( groupAINI > groupBINI ):
         addLog( 'logNormal', '{} obtient le bonus d\'initiative ! ({} vs {})'.format( groupBattleA.group.groupName , groupAINI, groupBINI ) )
         # Le groupe A à le bonus
@@ -185,48 +251,48 @@ def phaseInitiative( groupBattleA, groupBattleB ):
 # - les dégâts résiduels du round précédent pour les défenseurs
 ###############################################################################
 def phaseCombat( attacker, defender ):
-    # Déclaration de la variable contenant les attaques+delta de CHACUN des membres du groupe
-    attackFlurry = []
-    # On remplit l'array par la STR+delta de chacun des membres pour faire une série d'attaques
-    for i in (range( 0 , attacker.membersStartRound)):
-        attackFlurry.append( ( attacker.caracSTR ) + delta( 50 , attacker.caracSTR ) )
-
-    addLog( 'logNormal' , 'L\'attaquant attaque {} fois avec une force moyenne de {}'
-                .format( attacker.membersStartRound , attacker.caracSTR ) )
+    # Calcul des dégats infligés par l'attaquant :
+    # 1) Chaque membre valide en début de round attaque avec sa force (+/- delta)
+    sommeDegats = attacker.membersStartRound * ( delta( attacker.caracSTR, 50 ) )
+    addLog( 'logNormal' , 'L\'attaquant attaque {} fois avec une force moyenne de {} pour un total de {} dégats'
+                .format( attacker.membersStartRound, attacker.caracSTR, sommeDegats ) )
     
-    # Calcul des items d'attackFlurry évités grâce à l'esquive
-    esquive = defender.caracEVA
-    attackSuccessful = 0
-    sommeDegats = 0
-
-    # Test d'esquive pour chaque coup de l'attackFlurry
-    # Pour chaque coup porté, on teste l'esquive. Si elle rate, la valeur d'attaque
-    # s'additionne aux dégâts réussis
-    for attack in attackFlurry:
-        if randint(0,100) > (esquive + delta(50,esquive) ):
-            attackSuccessful += 1
-            sommeDegats += attack
-
-    addLog( 'logNormal' , 'Le défenseur a {} % de chances d\'esquiver. {} attaques touchent leurs cibles, pour un total de {} dégâts'
-                .format( esquive, attackSuccessful , sommeDegats ))
+    # Calcul des dégats évités grâce à l'esquive 
+    # 1) la carac EVA est un %age des dégats esquivés (+/- delta)
+    percentEsquive = delta( defender.caracEVA, 50 )
+    # 2) On applique ce %age aux dégats pour voir combien sont esquivés
+    degatsEsquives =  floor( sommeDegats * percentEsquive / 100 )
+    # 3) On soustrait les dégats esquivés à la somme des dégats
+    sommeDegats -= degatsEsquives
+    addLog( 'logNormal' , 'Le défenseur a en moyenne {} % de chances d\'esquiver. {} dégats sont esquivés. L\'attaquant inflige au final {} dégâts'
+                .format( defender.caracEVA, degatsEsquives , sommeDegats ))
     
-    # Absorption des dégâts par le défenseur. Pour chaque attaque, les defenseurs additionnent leur groupDEF
-    absorptionDefender = attackSuccessful * defender.caracDEF
-    sommeDegats -= absorptionDefender
-    if sommeDegats < 0:
-        sommeDegats = 0
-
-    addLog( 'logNormal' , 'Le défenseur absorbe {} dégâts. L\'attaquant inflige au final {} points de dégâts'
-                .format( absorptionDefender, sommeDegats ))
-
-    # Calcul des individus à terre chez les defenseurs
-    defender.group.groupMemberInjured += floor( sommeDegats / 10)
-    defender.group.groupMemberHealthy -= defender.group.groupMemberInjured
-
-    if defender.group.groupMemberHealthy < 0:
-        defender.group.groupMemberHealthy = 0
+    # On inflige les dégats au défenseur, et on calcule les pertes. 
+    # 1) On ajoute les dégats résiduels du tour précédent (si on les avait ajouté avant, le défenseur aurait pu les ré-ésquiver)
+    sommeDegats += defender.residualDamage
+    # 2) Chaque défenseur à DEF * X PV
+    defPV = defender.caracDEF * DEF_TO_PV_MULTIPLICATOR
+    # 3) Calcul du nombre de victimes
+    victims = floor( sommeDegats / defPV )
+    if( victims > defender.group.groupMemberHealthy ):
+        victims = defender.group.groupMemberHealthy
+    # 4) Calcul des dégats résiduels (= blessures à transférer au prochain tour)
+    defender.residualDamage = sommeDegats - victims * defPV
+    # 5) Calcul des individus à terre chez les defenseurs
+    defender.group.groupMemberInjured += victims
+    defender.group.groupMemberHealthy -= victims
 
     # On décompte les victimes
+    if( victims == 0 ):
+        addLog( 'logNormal' , 'Les défenseurs encaissent l\'assaut sans faiblir. Seuls quelques blessures légères ({} points de dégats) sont a déplorer'
+                .format( defender.residualDamage ))
+    elif( ( defender.group.groupMemberHealthy > 0 ) and ( defender.residualDamage > 0 ) ):
+        addLog( 'logNormal' , '{} défenseurs tombent sous les coups des assaillants. De plus, quelques blessures légères ({} points de dégats) sont a déplorer'
+                .format( victims, defender.residualDamage ))
+    else:
+        addLog( 'logNormal' , '{} défenseurs tombent sous les coups des assaillants.'
+                .format( victims ))
+
     addLog( 'logNormal' , '{} combattants ont été mis à terre chez les défenseurs : il reste {} membres aptes à continuer la bataille'
                 .format( defender.group.groupMemberInjured , defender.group.groupMemberHealthy ) )
 
@@ -248,18 +314,14 @@ def phaseMaintenance(groupBattleA , groupBattleB):
         addLog( 'logNormal' , 'C\'est une belle victoire de {}, dont {} combattants restent valides !'
                     .format( groupBattleB.group.groupName , groupBattleB.group.groupMemberHealthy ))
         groupBattleB.won = True
-        exit   
     elif ( ( groupBattleB.group.groupMemberHealthy < 1 ) and ( groupBattleA.group.groupMemberHealthy > 0 ) and ( groupBattleA.won is False ) and ( groupBattleB.won is False ) ):
         addLog( 'logNormal' , 'C\'est une belle victoire de {}, dont {} combattants restent valides !'
                     .format( groupBattleA.group.groupName , groupBattleA.group.groupMemberHealthy ))
         groupBattleA.won = True
-        exit
-
     elif ( ( groupBattleB.group.groupMemberHealthy < 1 ) and ( groupBattleA.group.groupMemberHealthy < 1 ) and ( groupBattleA.won is False ) and ( groupBattleB.won is False ) ):
         addLog( 'logNormal' , 'La bataille se solde par une débandade générale ! Les deux groupes sont épuisés et blessés. Pas de gagnant.' )
         groupBattleA.won = True
         groupBattleB.won = True
-        exit
     else:
         addLog( 'logNormal' , 'Le groupe \"{}\" ({} , {} , {}) continue le combat contre \"{}\" ({} , {} , {} )'
                     .format(groupBattleA.group.groupName , groupBattleA.group.groupMemberHealthy, groupBattleA.group.groupMemberInjured , groupBattleA.group.groupMemberDead , groupBattleB.group.groupName , groupBattleB.group.groupMemberHealthy , 
@@ -270,10 +332,8 @@ def phaseMaintenance(groupBattleA , groupBattleB):
 # Cette fonction gère l'ajout d'une ligne à un compte rendu
 # Elle gère aussi l'ajout de brackets HTML pour la mise en forme du log
 # au niveau du template django
-###############################################################################
-
 # loglevel is either logTitle, loglogSubTitle or logNormal
+###############################################################################
 def addLog( logLevel , strToAdd ):
     global battleLog
     battleLog = battleLog + '<p id=\"{}\">'.format(logLevel) +  strToAdd + '</p>' + '\n'
-

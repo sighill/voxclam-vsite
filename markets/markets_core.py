@@ -10,12 +10,33 @@
 # ---------------------------------------------------------------------
 
 from .models import *
+from random import randint
+
+
+# Fixed variables for test
+refill_quantity = 1
+
+# This function returns an object randomly picked within the 
+# specified class
+# Function RandomPick is designed to get the number of iterations
+# in a class and within its range choose an iteration randomly
+
+def RandomPicker(class_name):
+	# Fill an array with all objects 
+	# (IDs can be non continuous !)
+	alea_boundaries = class_name.objects.all()
+	# Choose a random number within the number of objects
+	alea = randint(0,alea_boundaries.count())
+	# Return the lucky one
+	chosen_object = class_name.objects.get(pk=alea+1)
+	return chosen_object
+
 
 # Function made to publish entries to the displayed markets
 # WIP : maybe we could def this encapsulated in class MarketBlu ?
 def MarketPublisher(refill_quantity):
-	# WIP
-	return
+	
+	
 
 # To resolve the 
 def MarketResolver(entry_gid , character_gid):
