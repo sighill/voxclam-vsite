@@ -64,7 +64,7 @@ def delta(margin , number):
 # On lui fournit les deux groupes prêts à combattre
 # et elle retourne le compte rendu du combat à afficher
 ###############################################################################
-def performBattle( groupA, groupB ):    
+def performBattle( groupA, groupB ):
     # On récupère les variables globales nécessaires...
     global battleLog
     global numberOfRounds
@@ -277,76 +277,3 @@ def addLog( logLevel , strToAdd ):
     global battleLog
     battleLog = battleLog + '<p id=\"{}\">'.format(logLevel) +  strToAdd + '</p>' + '\n'
 
-'''
-###############################################################################
-# Tout le code à partir d'ici ne sert qu'à tester le Battle Engine sans 
-# interraction avec la partie modèle (en gros uniquement pour faire des 
-# test sur mon PC perso en entrant toutes les infos à la main)
-###############################################################################
-
-class Group():
-    # Group unique id
-    groupGid = 0
-    # name of the group
-    groupName = ''
-    # Owner of the group
-    groupOwner  = ''
-    # Group's healthy members
-    groupMemberHealthy = 0
-    # Group's injured members
-    groupMemberInjured = 0
-    # Group's dead members
-    groupMemberDead = 0
-    # group native stats
-    groupPAC = 0
-    groupMOV = 0
-    groupINI = 0
-    groupSTR = 0
-    groupEVA = 0
-    groupDEF = 0
-    groupFAV = 0
-    groupMOR = 0
-    groupSPE = 0
-    # Equipment slots
-    equiRH = 0
-    equiLH = 0
-    equiArmor = 0
-    # Used to return the name of the iteration in admin panel
-    def __str__(self):
-        return self.groupName
-
-if __name__ == "__main__":
-    groupA = Group()
-    groupA.groupName = "Lansquenets"
-    groupA.groupMemberHealthy = 30
-    # Group's injured members
-    groupA.groupMemberInjured = 0
-    # Group's dead members
-    groupA.groupMemberDead = 0
-    groupA.groupPAC = 5
-    groupA.groupMOV = 100
-    groupA.groupINI = 10
-    groupA.groupSTR = 8
-    groupA.groupEVA = 30
-    groupA.groupDEF = 12
-    groupA.groupFAV = 0
-    groupA.groupMOR = 25
-
-    groupB = Group()
-    groupB.groupName = "Pécores"
-    groupB.groupMemberHealthy = 40
-    # Group's injured members
-    groupB.groupMemberInjured = 0
-    # Group's dead members
-    groupB.groupMemberDead = 0
-    groupB.groupPAC = 5
-    groupB.groupMOV = 100
-    groupB.groupINI = 8
-    groupB.groupSTR = 9
-    groupB.groupEVA = 10
-    groupB.groupDEF = 11
-    groupB.groupFAV = 0
-    groupB.groupMOR = 28
-
-    print( performBattle( groupA, groupB ) )
-    '''
