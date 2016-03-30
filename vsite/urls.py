@@ -19,4 +19,6 @@ from django.contrib import admin
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^battle/', include('battle.urls')),
+    url(r'^geo/', include('geo.urls')),
+
 ]
