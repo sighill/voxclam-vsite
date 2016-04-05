@@ -1,24 +1,27 @@
 {% load leaflet_tags %}
+<html>
+    <head>
+        <title>Carte de Clémence</title>
+        <!-- django-leaflet specific informations-->
+        {% leaflet_js %}
+        {% leaflet_css %}
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    </head>
 
-<head>
-    <title>Carte de Clémence</title>
-    <!-- django-leaflet specific informations-->
-    {% leaflet_js %}
-    {% leaflet_css %}
-    <!-- CCS style (i know, dirty way) -->
-    <style>
-        *{margin:6;padding:6;color:white;font-family: Helvetica, Arial, sans-serif;}
-        body{text-align:center;background-color: #1A2530}
-        h1{padding-bottom: 20px;padding-top: 5px;}
-        p{padding-bottom: 10px;}
-        #wrapper{width:880px;margin:0 auto;text-align:center;background-color:#34495E;}
-        #wip{color: yellow}
-        #blackTExt{color:black;}
-    </style>
-</head>
+    <body>
+        <h1>Map leaflet par défaut</h1>
+        {% leaflet_map "foo" %}
 
-<body>
-    <div id="wrapper">
-        {% leaflet_map "mapClemence" %}
-    </div>
-</body>
+        <h1>GeoJSON layer view</h1>
+
+        <script type="text/javascript">
+            function main_map_init (map, options) {
+                var layer = L.geoJson();
+                map.addLayer(layer);
+                $.getJSON("{% url 'data' %}", function (data) {
+                    layer.addData(data);
+                });
+            }
+        </script>
+    </body>
+</html>

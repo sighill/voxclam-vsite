@@ -55,6 +55,8 @@ manage.py
 
 # personal stuff
 settings.py
+assets
+*.json
 
 # Sphinx documentation
 docs/_build/
